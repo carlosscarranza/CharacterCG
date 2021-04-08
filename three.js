@@ -5,9 +5,24 @@ var ojoGeometria, ojoMaterial, ojoMesh;
 var bigoteGeometria, bigoteMaterial, bigoteMesh;
 var hombrosGeometria, hombrosMaterial, hombrosMesh;
 var brazoGeometria, brazoMaterial, legsMesh;
+var stats, controls;
+
 let luigi = new THREE.Object3D();
 init();
+
 animate();
+
+
+function createStats() {
+  stats = new Stats();
+  stats.setMode(1); // 0: fps, 1: ms, 2memory
+  stats.domElement.style.position = "absolute";
+  stats.domElement.style.left = "100px";
+  stats.domElement.style.top = "10px";
+  document.getElementById("myStats").appendChild(stats.domElement);
+  return stats;
+}
+
 function init() {
   camera = new THREE.PerspectiveCamera(
     70,
@@ -18,6 +33,7 @@ function init() {
   camera.position.z = 4;
   camera.position.y = 1;
   scene = new THREE.Scene();
+
   //gorra
   cabezaGeometria = new THREE.BoxGeometry(0.8, 0.4, 0.15);
   cabezaMaterial = new THREE.MeshBasicMaterial({ color: 0x45b245 });
@@ -130,10 +146,17 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+
+  //Controls
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  
   let loader = new THREE.TextureLoader();
   loader.load("./luigi.jpg", function (texture) {
     scene.background = texture;
   });
+
+  //Stats
+  createStats();
 }
 function build_legs() {
   let legs = new THREE.Object3D();
@@ -167,7 +190,10 @@ function build_legs() {
   legs.add(shoesMesh);
   return legs;
 }
+
 function animate() {
+  controls.update();
+  stats.update();
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 }
